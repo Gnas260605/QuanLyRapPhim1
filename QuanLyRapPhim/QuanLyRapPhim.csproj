@@ -74,6 +74,7 @@
     </Content>
     <Content Include="ChiTietPhim.aspx" />
     <Content Include="ChonGhe.aspx" />
+    <Content Include="DangKy.aspx" />
     <Content Include="DangNhap.aspx" />
     <Content Include="Global.asax" />
     <Content Include="LichSuDatVe.aspx" />
@@ -108,6 +109,11 @@
     <Compile Include="ChonGhe.aspx.designer.cs">
       <DependentUpon>ChonGhe.aspx</DependentUpon>
     </Compile>
+    <Compile Include="DangKy.aspx.cs">
+      <DependentUpon>DangKy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DangKy.aspx.designer.cs" />
     <Compile Include="DangNhap.aspx.cs">
       <DependentUpon>DangNhap.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

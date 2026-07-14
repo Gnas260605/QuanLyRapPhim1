@@ -19,6 +19,12 @@ obj/
 *.suo
 *.user
 *.userimages
+*.cache
+*.svclog
+*.dbmdl
+*.opendb
+*.vspscc
+*.vssscc
 
 # Crash dumps
 *.dmp
