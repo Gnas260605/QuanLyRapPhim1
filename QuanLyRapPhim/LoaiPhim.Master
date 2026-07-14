@@ -1,0 +1,68 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="LoaiPhim.Master.cs" Inherits="QuanLyRapPhim.LoaiPhim" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>Quản Lý Rạp Phim</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Phần đầu trang -->
+        <div class="header">
+            <h1>HỆ THỐNG ĐẶT VÉ XEM PHIM</h1>
+            <div class="nav">
+                <a href="Phim.aspx">Trang chủ</a> | 
+                <a href="DangNhap.aspx">Đăng nhập</a> | 
+                <a href="DangKy.aspx">Đăng ký</a> | 
+                <a href="LichSuDatVe.aspx">Lịch sử đặt vé</a> |
+                <a href="AdminPhim.aspx" style="color: #ff7b00; font-weight: bold;">Quản lý Phim</a>
+            </div>
+        </div>
+
+        <!-- Bố cục trang -->
+        <div class="container">
+            <!-- Cột trái: Thể loại phim -->
+            <div class="left">
+                <h2>THỂ LOẠI</h2>
+                <asp:DataList ID="DataList1" runat="server">
+                    <ItemTemplate>
+                        <asp:LinkButton ID="LinkButton1" runat="server" 
+                            Text='<%# Eval("TheLoai") %>' 
+                            CommandArgument='<%# Eval("TheLoai") %>' 
+                            OnClick="LinkButton1_Click">
+                        </asp:LinkButton>
+                    </ItemTemplate>
+                </asp:DataList>
+            </div>
+
+            <!-- Cột giữa: Nội dung thay đổi -->
+            <div class="center">
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+
+            <!-- Cột phải: Khuyến mãi -->
+            <div class="right">
+                <h3>KHUYẾN MÃI</h3>
+                <div class="promo-card">
+                    <div class="promo-title">Thứ 4 Vui Vẻ</div>
+                    <div class="promo-desc">Khuyến mãi mua 2 vé tặng 1 bắp nước ngọt ngào vào mỗi thứ 4 hàng tuần!</div>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-title">Đồng Giá Vé</div>
+                    <div class="promo-desc">Chỉ từ 45.000đ cho Học sinh - Sinh viên khi mua tại quầy.</div>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-title">Combo Couple</div>
+                    <div class="promo-desc">Tiết kiệm 20% khi mua gói combo 2 vé + 2 nước + 1 bắp lớn.</div>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+
