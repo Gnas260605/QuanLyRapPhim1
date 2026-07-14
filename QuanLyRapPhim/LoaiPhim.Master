@@ -5,7 +5,8 @@
 <head runat="server">
     <meta charset="utf-8" />
     <title>Quản Lý Rạp Phim</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="style.css?v=3" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -15,18 +16,46 @@
         <div class="header">
             <h1>HỆ THỐNG ĐẶT VÉ XEM PHIM</h1>
             <div class="nav">
-                <a href="Phim.aspx">Trang chủ</a> | 
-                <a href="DangNhap.aspx">Đăng nhập</a> | 
-                <a href="DangKy.aspx">Đăng ký</a> | 
-                <a href="LichSuDatVe.aspx">Lịch sử đặt vé</a> |
-                <a href="AdminPhim.aspx" style="color: #ff7b00; font-weight: bold;">Quản lý Phim</a>
+                <a href="Phim.aspx">Trang chủ</a> |
+
+                <%-- Link Dashboard: chỉ hiển thị cho Admin và Staff --%>
+                <asp:HyperLink ID="lnkDashboard" runat="server"
+                    NavigateUrl="~/AdminDashboard.aspx"
+                    Style="color: #4fd1c5; font-weight: bold;">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </asp:HyperLink>
+                <asp:Literal ID="litSepDash" runat="server"> | </asp:Literal>
+
+                <%-- Link Quản lý Phim: chỉ hiển thị cho Admin và Staff --%>
+                <asp:HyperLink ID="lnkQuanLyPhim" runat="server"
+                    NavigateUrl="~/AdminPhim.aspx"
+                    Style="color: #ff7b00; font-weight: bold;">
+                    <i class="fa fa-film"></i> Quản lý Phim
+                </asp:HyperLink>
+                <asp:Literal ID="litSepQuanLy" runat="server"> | </asp:Literal>
+
+
+                <%-- Hiển thị khi CHƯA đăng nhập --%>
+                <asp:Panel ID="pnlChuaDangNhap" runat="server">
+                    <a href="DangNhap.aspx">Đăng nhập</a>
+                </asp:Panel>
+
+                <%-- Hiển thị khi ĐÃ đăng nhập --%>
+                <asp:Panel ID="pnlDaDangNhap" runat="server" Visible="false">
+                    Xin chào, <strong><asp:Label ID="lblTenNguoiDung" runat="server"></asp:Label></strong> |
+                    <a href="LichSuDatVe.aspx">Lịch sử đặt vé</a> |
+                    <asp:LinkButton ID="btnDangXuat" runat="server"
+                        OnClick="btnDangXuat_Click"
+                        Style="color:#e74c3c; cursor:pointer;">Đăng xuất</asp:LinkButton>
+                </asp:Panel>
             </div>
         </div>
 
-        <!-- Bố cục trang -->
+
+         <!-- Bố cục trang -->
         <div class="container">
             <!-- Cột trái: Thể loại phim -->
-            <div class="left">
+            <div class="left" id="divLeft" runat="server">
                 <h2>THỂ LOẠI</h2>
                 <asp:DataList ID="DataList1" runat="server">
                     <ItemTemplate>
@@ -46,7 +75,8 @@
             </div>
 
             <!-- Cột phải: Khuyến mãi -->
-            <div class="right">
+            <div class="right" id="divRight" runat="server">
+
                 <h3>KHUYẾN MÃI</h3>
                 <div class="promo-card">
                     <div class="promo-title">Thứ 4 Vui Vẻ</div>

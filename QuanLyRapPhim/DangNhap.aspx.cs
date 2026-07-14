@@ -37,6 +37,20 @@ namespace QuanLyRapPhim
                 Session["MaNguoiDung"] = dt.Rows[0]["MaNguoiDung"];
                 Session["HoTen"] = dt.Rows[0]["HoTen"];
 
+                // Lưu role/vai trò người dùng vào Session
+                // Hệ thống chỉ có 2 role: Admin và Staff
+                string vaiTro = Role.STAFF; // Mặc định là Staff
+                if (dt.Rows[0].Table.Columns.Contains("VaiTro") && dt.Rows[0]["VaiTro"] != DBNull.Value)
+                {
+                    string vaiTroDb = dt.Rows[0]["VaiTro"].ToString().Trim();
+                    // Chỉ chấp nhận role hợp lệ trong hệ thống
+                    if (Role.GetAllRoles().Contains(vaiTroDb))
+                    {
+                        vaiTro = vaiTroDb;
+                    }
+                }
+                Session["VaiTro"] = vaiTro;
+
                 // Quay lại trang trước đó nếu có
                 if (Session["ReturnUrl"] != null)
                 {

@@ -14,11 +14,43 @@ namespace QuanLyRapPhim
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Page.IsPostBack) return;
-            // Lấy danh sách thể loại phim
-            string q = "select distinct TheLoai from Phim";
-            this.DataList1.DataSource = kn.LayKetNoi(q);
-            this.DataList1.DataBind();
+
+            // Kiểm tra xem có đang ở trang quản trị hay không
+            string pageName = System.IO.Path.GetFileName(Request.Url.AbsolutePath).ToLower();
+            bool isAdminPage = pageName.Contains("admin") || pageName.Contains("quanly");
+
+            if (isAdminPage)
+            {
+                // Ẩn cột thể loại (cột trái) và cột khuyến mãi (cột phải)
+                divLeft.Visible = false;
+                divRight.Visible = false;
+            }
+            else
+            {
+                // Chỉ lấy danh sách thể loại phim khi ở trang thường
+                string q = "select distinct TheLoai from Phim";
+                this.DataList1.DataSource = kn.LayKetNoi(q);
+                this.DataList1.DataBind();
+            }
+
+            // Điều khiển hiển thị nav theo trạng thái đăng nhập và role
+            bool isLoggedIn = AuthorizationHelper.IsLoggedIn();
+            bool isAdminOrStaff = AuthorizationHelper.IsAdminOrStaff();
+
+            // Hiển thị tên người dùng và nút Đăng xuất khi đã đăng nhập
+            pnlDaDangNhap.Visible = isLoggedIn;
+            pnlChuaDangNhap.Visible = !isLoggedIn;
+
+            // Chỉ hiển thị link "Dashboard" và "Quản lý Phim" cho Admin và Staff
+            lnkDashboard.Visible = isAdminOrStaff;
+            lnkQuanLyPhim.Visible = isAdminOrStaff;
+
+            if (isLoggedIn)
+            {
+                lblTenNguoiDung.Text = AuthorizationHelper.GetUserName();
+            }
         }
+
 
         protected void LinkButton1_Click(object sender, EventArgs e)
         {
@@ -27,5 +59,12 @@ namespace QuanLyRapPhim
             Context.Items["TL"] = theLoai;
             Server.Transfer("Phim.aspx");
         }
+
+        protected void btnDangXuat_Click(object sender, EventArgs e)
+        {
+            // Đăng xuất và về trang chủ
+            AuthorizationHelper.Logout();
+            Response.Redirect("Phim.aspx");
+        }
     }
-}
+}

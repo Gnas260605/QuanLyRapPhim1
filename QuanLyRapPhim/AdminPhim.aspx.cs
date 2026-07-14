@@ -9,8 +9,11 @@ using System.Data.SqlClient;
 
 namespace QuanLyRapPhim
 {
-    public partial class AdminPhim : System.Web.UI.Page
+    public partial class AdminPhim : SecurePage
     {
+        // Chỉ Admin và Staff mới được phép truy cập trang này
+        protected override string[] AllowedRoles { get; set; } = new[] { Role.ADMIN, Role.STAFF };
+
         KetNoi kn = new KetNoi();
 
         private string GetConnectionString()
