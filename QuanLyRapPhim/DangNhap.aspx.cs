@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace QuanLyRapPhim
 {
@@ -27,9 +28,14 @@ namespace QuanLyRapPhim
                 return;
             }
 
-            // Đăng nhập
-            string sql = "select * from NguoiDung where Email = '" + email + "' and MatKhau = '" + matKhau + "'";
-            DataTable dt = kn.LayKetNoi(sql);
+            // Đăng nhập (dùng parameterized query để chống SQL Injection)
+            string sql = "select * from NguoiDung where Email = @Email and MatKhau = @MatKhau";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@Email", email),
+                new SqlParameter("@MatKhau", matKhau)
+            };
+            DataTable dt = kn.LayKetNoi(sql, parameters);
 
             if (dt != null && dt.Rows.Count > 0)
             {

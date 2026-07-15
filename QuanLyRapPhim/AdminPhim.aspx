@@ -104,9 +104,11 @@
             </div>
             <div class="form-col">
                 <div class="form-group">
-                    <label>Tên file hình ảnh *</label>
-                    <asp:TextBox ID="txtHinhAnh" runat="server" CssClass="form-control" placeholder="Ví dụ: endgame.jpg"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="rfvHinh" runat="server" ControlToValidate="txtHinhAnh" ErrorMessage="Tên ảnh không được trống!" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                    <label>Hình ảnh phim * <span style="font-weight: normal; color: #a0aec0; font-size: 12px;">(jpg, png, gif — tối đa 4MB)</span></label>
+                    <asp:FileUpload ID="fuHinhAnh" runat="server" CssClass="form-control" />
+                    <%-- Khi sửa phim: hiển thị ảnh hiện tại, để trống nếu không muốn đổi ảnh --%>
+                    <asp:Label ID="lblHinhHienTai" runat="server" ForeColor="#4fd1c5" style="display: block; margin-top: 6px; font-size: 13px;"></asp:Label>
+                    <asp:HiddenField ID="hdnHinhAnhCu" runat="server" />
                 </div>
             </div>
         </div>

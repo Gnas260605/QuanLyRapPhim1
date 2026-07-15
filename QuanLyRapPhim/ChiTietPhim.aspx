@@ -21,21 +21,23 @@
     <hr />
 
     <h3>DANH SÁCH SUẤT CHIẾU</h3>
-    <asp:DataList ID="dlSuatChieu" runat="server" Width="100%">
+    <asp:DataList ID="dlSuatChieu" runat="server" Width="100%" OnItemDataBound="dlSuatChieu_ItemDataBound">
         <ItemTemplate>
             <div style="border: 1px solid rgba(255, 255, 255, 0.05); padding: 20px; margin-bottom: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; background-color: #1e1e2d; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                 <div>
                     <strong style="color: #a0aec0;">Phòng chiếu:</strong> <asp:Label ID="lblPhong" runat="server" Text='<%# Eval("TenPhong") %>'></asp:Label> <br />
                     <strong style="color: #a0aec0;">Ngày chiếu:</strong> <asp:Label ID="lblNgay" runat="server" Text='<%# Eval("NgayChieu", "{0:dd/MM/yyyy}") %>'></asp:Label> <br />
-                    <strong style="color: #a0aec0;">Giờ chiếu:</strong> <asp:Label ID="lblGio" runat="server" Text='<%# Eval("GioBatDau") %>' ForeColor="#ff2e54" Font-Bold="true"></asp:Label>
+                    <strong style="color: #a0aec0;">Giờ chiếu:</strong> <asp:Label ID="lblGio" runat="server" Text='<%# Eval("GioBatDau") %>' ForeColor="#ff2e54" Font-Bold="true"></asp:Label> <br />
+                    <strong style="color: #a0aec0;">Ghế trống:</strong> <asp:Label ID="lblGheTrong" runat="server" Font-Bold="true"></asp:Label>
                 </div>
                 <div>
                     <strong style="color: #ff7b00; font-size: 18px;"><asp:Label ID="lblGia" runat="server" Text='<%# Eval("GiaVeCoBan", "{0:0,0}") %>'></asp:Label> VND</strong>
                 </div>
                 <div>
-                    <asp:Button ID="btnDatVe" runat="server" Text="Đặt vé" 
-                        PostBackUrl='<%# "ChonGhe.aspx?MaLichChieu=" + Eval("MaLichChieu") %>' 
+                    <asp:Button ID="btnDatVe" runat="server" Text="Đặt vé"
+                        PostBackUrl='<%# "ChonGhe.aspx?MaLichChieu=" + Eval("MaLichChieu") %>'
                         CssClass="btn" />
+                    <asp:Label ID="lblHetGhe" runat="server" Text="Hết ghế" ForeColor="#e53e3e" Font-Bold="true" Visible="false"></asp:Label>
                 </div>
             </div>
         </ItemTemplate>

@@ -63,6 +63,51 @@ namespace QuanLyRapPhim
 
                 try
                 {
+                    // 0. Khóa và kiểm tra lại ghế NGAY TRONG transaction để chống mua trùng.
+                    //    UPDLOCK + HOLDLOCK giữ khóa tới khi commit -> nếu 2 người cùng thanh toán
+                    //    một ghế thì người sau phải chờ và sẽ thấy ghế đã bị đặt, không bán trùng được.
+                    if (listGhe.Count > 0)
+                    {
+                        List<string> tenThamSoGhe = new List<string>();
+                        using (SqlCommand cmdCheck = new SqlCommand())
+                        {
+                            cmdCheck.Connection = conn;
+                            cmdCheck.Transaction = trans;
+                            for (int i = 0; i < listGhe.Count; i++)
+                            {
+                                string tenThamSo = "@g" + i;
+                                tenThamSoGhe.Add(tenThamSo);
+                                cmdCheck.Parameters.AddWithValue(tenThamSo, listGhe[i]);
+                            }
+                            cmdCheck.Parameters.AddWithValue("@MaLichChieu", maLichChieu);
+                            cmdCheck.CommandText =
+                                "select G.Hang, G.So " +
+                                "from ChiTietDatVe CT with (updlock, holdlock) " +
+                                "inner join DatVe DV with (updlock, holdlock) on CT.MaDatVe = DV.MaDatVe " +
+                                "inner join Ghe G on CT.MaGhe = G.MaGhe " +
+                                "where DV.MaLichChieu = @MaLichChieu and DV.TrangThai = N'Đã thanh toán' " +
+                                "and CT.MaGhe in (" + string.Join(",", tenThamSoGhe) + ")";
+
+                            List<string> gheBiTrung = new List<string>();
+                            using (SqlDataReader reader = cmdCheck.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    gheBiTrung.Add(reader["Hang"].ToString() + reader["So"].ToString());
+                                }
+                            }
+
+                            if (gheBiTrung.Count > 0)
+                            {
+                                trans.Rollback();
+                                lblThanhCong.Text = "";
+                                lblThongBao.Text = "Rất tiếc, ghế " + string.Join(", ", gheBiTrung) +
+                                                   " vừa được người khác đặt. Vui lòng quay lại chọn ghế khác!";
+                                return;
+                            }
+                        }
+                    }
+
                     // 1. Thêm vào bảng DatVe
                     string sqlDatVe = "insert into DatVe (MaNguoiDung, MaLichChieu, NgayDat, TongTien, TrangThai) values (@MaNguoiDung, @MaLichChieu, GETDATE(), @TongTien, N'Đã thanh toán'); SELECT SCOPE_IDENTITY();";
                     int maDatVe = 0;

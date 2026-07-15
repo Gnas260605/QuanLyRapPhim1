@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Web.UI.WebControls;
 
 namespace QuanLyRapPhim
@@ -67,31 +68,132 @@ namespace QuanLyRapPhim
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            string maPhim = ddlPhim.SelectedValue;
-            string maPhong = ddlPhong.SelectedValue;
-            string ngayChieu = txtNgayChieu.Text.Trim();
-            string gioChieu = txtGioBatDau.Text.Trim();
-            string giaVe = txtGiaVe.Text.Trim();
-
-            if (string.IsNullOrEmpty(hdnMaLichChieu.Value))
+            // ── Bước 1: Kiểm tra dữ liệu nhập ──────────────────────
+            int maPhim, maPhong;
+            if (!int.TryParse(ddlPhim.SelectedValue, out maPhim) || !int.TryParse(ddlPhong.SelectedValue, out maPhong))
             {
-                // Thêm mới
-                string sqlInsert = $"INSERT INTO LichChieu (MaPhim, MaPhong, NgayChieu, GioBatDau, GiaVeCoBan) VALUES ({maPhim}, {maPhong}, '{ngayChieu}', '{gioChieu}', {giaVe})";
-                DataTable dt = kn.LayKetNoi(sqlInsert);
-                lblMsg.Text = "Thêm lịch chiếu mới thành công!";
-                lblMsg.ForeColor = System.Drawing.Color.Green;
+                BaoLoi("Vui lòng chọn Phim và Phòng chiếu!");
+                return;
+            }
+
+            DateTime ngayChieu;
+            if (!DateTime.TryParse(txtNgayChieu.Text.Trim(), out ngayChieu))
+            {
+                BaoLoi("Ngày chiếu không hợp lệ! Hãy nhập theo dạng yyyy-MM-dd.");
+                return;
+            }
+
+            TimeSpan gioBatDau;
+            if (!TimeSpan.TryParse(txtGioBatDau.Text.Trim(), out gioBatDau) || gioBatDau.TotalHours >= 24)
+            {
+                BaoLoi("Giờ bắt đầu không hợp lệ! Hãy nhập theo dạng HH:mm (ví dụ 19:30).");
+                return;
+            }
+
+            decimal giaVe;
+            if (!decimal.TryParse(txtGiaVe.Text.Trim(), out giaVe) || giaVe <= 0)
+            {
+                BaoLoi("Giá vé phải là một số lớn hơn 0!");
+                return;
+            }
+
+            // Không cho xếp lịch chiếu trong quá khứ
+            if (ngayChieu.Date.Add(gioBatDau) <= DateTime.Now)
+            {
+                BaoLoi("Không thể xếp lịch chiếu ở thời điểm trong quá khứ!");
+                return;
+            }
+
+            // ── Bước 2: Kiểm tra trùng lịch trong cùng phòng ───────
+            // Lấy thời lượng của phim sắp xếp lịch
+            DataTable dtPhim = kn.LayKetNoi(
+                "SELECT ThoiLuong FROM Phim WHERE MaPhim = @MaPhim",
+                new SqlParameter[] { new SqlParameter("@MaPhim", maPhim) });
+            if (dtPhim == null || dtPhim.Rows.Count == 0)
+            {
+                BaoLoi("Phim được chọn không tồn tại!");
+                return;
+            }
+            int thoiLuongMoi = Convert.ToInt32(dtPhim.Rows[0]["ThoiLuong"]);
+
+            // Khi đang sửa thì bỏ qua chính suất chiếu đó (MaLichChieu <> @MaLichChieuHienTai)
+            int maLichChieuHienTai = 0;
+            if (!string.IsNullOrEmpty(hdnMaLichChieu.Value))
+            {
+                maLichChieuHienTai = Convert.ToInt32(hdnMaLichChieu.Value);
+            }
+
+            // Hai suất bị trùng khi: suất mới bắt đầu trước khi suất cũ kết thúc
+            // VÀ suất cũ bắt đầu trước khi suất mới kết thúc (kết thúc = bắt đầu + thời lượng phim)
+            string sqlTrung =
+                "SELECT COUNT(*) AS SoTrung " +
+                "FROM LichChieu LC " +
+                "INNER JOIN Phim P ON LC.MaPhim = P.MaPhim " +
+                "WHERE LC.MaPhong = @MaPhong " +
+                "  AND LC.NgayChieu = @NgayChieu " +
+                "  AND LC.MaLichChieu <> @MaLichChieuHienTai " +
+                "  AND @GioBatDau < DATEADD(MINUTE, P.ThoiLuong, LC.GioBatDau) " +
+                "  AND LC.GioBatDau < DATEADD(MINUTE, @ThoiLuongMoi, @GioBatDau)";
+
+            DataTable dtTrung = kn.LayKetNoi(sqlTrung, new SqlParameter[]
+            {
+                new SqlParameter("@MaPhong", maPhong),
+                new SqlParameter("@NgayChieu", ngayChieu.Date),
+                new SqlParameter("@MaLichChieuHienTai", maLichChieuHienTai),
+                new SqlParameter("@GioBatDau", gioBatDau),
+                new SqlParameter("@ThoiLuongMoi", thoiLuongMoi)
+            });
+            if (dtTrung != null && Convert.ToInt32(dtTrung.Rows[0]["SoTrung"]) > 0)
+            {
+                BaoLoi("Phòng này đã có suất chiếu khác bị trùng khung giờ! Hãy chọn giờ hoặc phòng khác.");
+                return;
+            }
+
+            // ── Bước 3: Lưu dữ liệu (parameterized query) ──────────
+            string sql;
+            if (maLichChieuHienTai == 0)
+            {
+                sql = "INSERT INTO LichChieu (MaPhim, MaPhong, NgayChieu, GioBatDau, GiaVeCoBan) " +
+                      "VALUES (@MaPhim, @MaPhong, @NgayChieu, @GioBatDau, @GiaVeCoBan)";
             }
             else
             {
-                // Cập nhật
-                string sqlUpdate = $"UPDATE LichChieu SET MaPhim = {maPhim}, MaPhong = {maPhong}, NgayChieu = '{ngayChieu}', GioBatDau = '{gioChieu}', GiaVeCoBan = {giaVe} WHERE MaLichChieu = {hdnMaLichChieu.Value}";
-                DataTable dt = kn.LayKetNoi(sqlUpdate);
-                lblMsg.Text = "Cập nhật lịch chiếu thành công!";
-                lblMsg.ForeColor = System.Drawing.Color.Green;
+                sql = "UPDATE LichChieu SET MaPhim = @MaPhim, MaPhong = @MaPhong, NgayChieu = @NgayChieu, " +
+                      "GioBatDau = @GioBatDau, GiaVeCoBan = @GiaVeCoBan WHERE MaLichChieu = @MaLichChieu";
             }
 
-            ResetForm();
-            LoadLichChieu();
+            var listParams = new System.Collections.Generic.List<SqlParameter>
+            {
+                new SqlParameter("@MaPhim", maPhim),
+                new SqlParameter("@MaPhong", maPhong),
+                new SqlParameter("@NgayChieu", ngayChieu.Date),
+                new SqlParameter("@GioBatDau", gioBatDau),
+                new SqlParameter("@GiaVeCoBan", giaVe)
+            };
+            if (maLichChieuHienTai != 0)
+            {
+                listParams.Add(new SqlParameter("@MaLichChieu", maLichChieuHienTai));
+            }
+
+            int ketQua = kn.ThucThi(sql, listParams.ToArray());
+            if (ketQua > 0)
+            {
+                lblMsg.Text = maLichChieuHienTai == 0 ? "Thêm lịch chiếu mới thành công!" : "Cập nhật lịch chiếu thành công!";
+                lblMsg.ForeColor = System.Drawing.Color.Green;
+                ResetForm();
+                LoadLichChieu();
+            }
+            else
+            {
+                BaoLoi("Có lỗi xảy ra, không thể lưu lịch chiếu!");
+            }
+        }
+
+        // Hiển thị thông báo lỗi màu đỏ
+        private void BaoLoi(string thongBao)
+        {
+            lblMsg.Text = thongBao;
+            lblMsg.ForeColor = System.Drawing.Color.Red;
         }
 
         protected void gvLichChieu_RowCommand(object sender, GridViewCommandEventArgs e)

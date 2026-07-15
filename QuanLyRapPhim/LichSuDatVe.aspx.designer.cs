@@ -24,6 +24,11 @@ namespace QuanLyRapPhim
         protected global::System.Web.UI.WebControls.Label lblChuaDangNhap;
 
         /// <summary>
+        /// lblMsg control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblMsg;
+
+        /// <summary>
         /// gvLichSu control.
         /// </summary>
         /// <remarks>

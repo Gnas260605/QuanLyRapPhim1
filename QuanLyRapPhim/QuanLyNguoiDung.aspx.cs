@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Web.UI.WebControls;
 
 namespace QuanLyRapPhim
@@ -52,8 +53,10 @@ namespace QuanLyRapPhim
                     return;
                 }
 
-                // Kiểm tra email trùng
-                DataTable dtCheck = kn.LayKetNoi($"SELECT COUNT(*) AS SoTK FROM NguoiDung WHERE Email = '{email}'");
+                // Kiểm tra email trùng (dùng parameterized query chống SQL Injection)
+                DataTable dtCheck = kn.LayKetNoi(
+                    "SELECT COUNT(*) AS SoTK FROM NguoiDung WHERE Email = @Email",
+                    new SqlParameter[] { new SqlParameter("@Email", email) });
                 if (dtCheck != null && Convert.ToInt32(dtCheck.Rows[0]["SoTK"]) > 0)
                 {
                     lblMsg.Text = "Email này đã được sử dụng!";
@@ -61,27 +64,47 @@ namespace QuanLyRapPhim
                     return;
                 }
 
-                string sqlInsert = $"INSERT INTO NguoiDung (HoTen, Email, SoDienThoai, MatKhau, VaiTro) VALUES (N'{hoTen}', '{email}', '{sdt}', '{matKhau}', '{vaiTro}')";
-                kn.LayKetNoi(sqlInsert);
+                string sqlInsert = "INSERT INTO NguoiDung (HoTen, Email, SoDienThoai, MatKhau, VaiTro) VALUES (@HoTen, @Email, @SoDienThoai, @MatKhau, @VaiTro)";
+                kn.ThucThi(sqlInsert, new SqlParameter[]
+                {
+                    new SqlParameter("@HoTen", hoTen),
+                    new SqlParameter("@Email", email),
+                    new SqlParameter("@SoDienThoai", sdt),
+                    new SqlParameter("@MatKhau", matKhau),
+                    new SqlParameter("@VaiTro", vaiTro)
+                });
                 lblMsg.Text = "Thêm tài khoản thành công!";
                 lblMsg.ForeColor = System.Drawing.Color.Green;
             }
             else
             {
-                // Cập nhật
-                string sqlUpdate = "";
+                // Cập nhật (dùng parameterized query chống SQL Injection)
+                string sqlUpdate;
                 if (!string.IsNullOrEmpty(matKhau))
                 {
                     // Có đổi mật khẩu mới
-                    sqlUpdate = $"UPDATE NguoiDung SET HoTen = N'{hoTen}', Email = '{email}', SoDienThoai = '{sdt}', MatKhau = '{matKhau}', VaiTro = '{vaiTro}' WHERE MaNguoiDung = {hdnMaNguoiDung.Value}";
+                    sqlUpdate = "UPDATE NguoiDung SET HoTen = @HoTen, Email = @Email, SoDienThoai = @SoDienThoai, MatKhau = @MatKhau, VaiTro = @VaiTro WHERE MaNguoiDung = @MaNguoiDung";
                 }
                 else
                 {
                     // Giữ nguyên mật khẩu cũ
-                    sqlUpdate = $"UPDATE NguoiDung SET HoTen = N'{hoTen}', Email = '{email}', SoDienThoai = '{sdt}', VaiTro = '{vaiTro}' WHERE MaNguoiDung = {hdnMaNguoiDung.Value}";
+                    sqlUpdate = "UPDATE NguoiDung SET HoTen = @HoTen, Email = @Email, SoDienThoai = @SoDienThoai, VaiTro = @VaiTro WHERE MaNguoiDung = @MaNguoiDung";
                 }
 
-                kn.LayKetNoi(sqlUpdate);
+                var listParams = new System.Collections.Generic.List<SqlParameter>
+                {
+                    new SqlParameter("@HoTen", hoTen),
+                    new SqlParameter("@Email", email),
+                    new SqlParameter("@SoDienThoai", sdt),
+                    new SqlParameter("@VaiTro", vaiTro),
+                    new SqlParameter("@MaNguoiDung", Convert.ToInt32(hdnMaNguoiDung.Value))
+                };
+                if (!string.IsNullOrEmpty(matKhau))
+                {
+                    listParams.Add(new SqlParameter("@MatKhau", matKhau));
+                }
+
+                kn.ThucThi(sqlUpdate, listParams.ToArray());
                 lblMsg.Text = "Cập nhật tài khoản thành công!";
                 lblMsg.ForeColor = System.Drawing.Color.Green;
             }

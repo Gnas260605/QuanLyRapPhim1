@@ -34,6 +34,29 @@
                 </asp:HyperLink>
                 <asp:Literal ID="litSepQuanLy" runat="server"> | </asp:Literal>
 
+                <%-- Link Quản lý Lịch chiếu: chỉ hiển thị cho Admin và Staff --%>
+                <asp:HyperLink ID="lnkQuanLyLichChieu" runat="server"
+                    NavigateUrl="~/QuanLyLichChieu.aspx"
+                    Style="color: #9b59b6; font-weight: bold;">
+                    <i class="fa fa-calendar"></i> Lịch chiếu
+                </asp:HyperLink>
+                <asp:Literal ID="litSepLichChieu" runat="server"> | </asp:Literal>
+
+                <%-- Link Quản lý Phòng chiếu & Ghế: chỉ hiển thị cho Admin và Staff --%>
+                <asp:HyperLink ID="lnkQuanLyPhong" runat="server"
+                    NavigateUrl="~/QuanLyPhongChieu.aspx"
+                    Style="color: #38b2ac; font-weight: bold;">
+                    <i class="fa fa-th"></i> Phòng chiếu
+                </asp:HyperLink>
+                <asp:Literal ID="litSepPhong" runat="server"> | </asp:Literal>
+
+                <%-- Link Quản lý Người dùng: chỉ hiển thị cho Admin --%>
+                <asp:HyperLink ID="lnkQuanLyNguoiDung" runat="server"
+                    NavigateUrl="~/QuanLyNguoiDung.aspx"
+                    Style="color: #3498db; font-weight: bold;">
+                    <i class="fa fa-users"></i> Người dùng
+                </asp:HyperLink>
+                <asp:Literal ID="litSepNguoiDung" runat="server"> | </asp:Literal>
 
                 <%-- Hiển thị khi CHƯA đăng nhập --%>
                 <asp:Panel ID="pnlChuaDangNhap" runat="server">
@@ -44,6 +67,7 @@
                 <asp:Panel ID="pnlDaDangNhap" runat="server" Visible="false">
                     Xin chào, <strong><asp:Label ID="lblTenNguoiDung" runat="server"></asp:Label></strong> |
                     <a href="LichSuDatVe.aspx">Lịch sử đặt vé</a> |
+                    <a href="DoiMatKhau.aspx">Đổi mật khẩu</a> |
                     <asp:LinkButton ID="btnDangXuat" runat="server"
                         OnClick="btnDangXuat_Click"
                         Style="color:#e74c3c; cursor:pointer;">Đăng xuất</asp:LinkButton>

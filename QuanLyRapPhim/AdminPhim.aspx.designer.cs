@@ -123,22 +123,31 @@ namespace QuanLyRapPhim
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvNgay;
 
         /// <summary>
-        /// txtHinhAnh control.
+        /// fuHinhAnh control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtHinhAnh;
+        protected global::System.Web.UI.WebControls.FileUpload fuHinhAnh;
 
         /// <summary>
-        /// rfvHinh control.
+        /// lblHinhHienTai control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvHinh;
+        protected global::System.Web.UI.WebControls.Label lblHinhHienTai;
+
+        /// <summary>
+        /// hdnHinhAnhCu control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnHinhAnhCu;
 
         /// <summary>
         /// txtMoTa control.

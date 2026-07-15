@@ -28,7 +28,8 @@
             <asp:Button ID="btnDangNhap" runat="server" Text="Đăng nhập" OnClick="btnDangNhap_Click" CssClass="btn" Width="100%" />
             
             <div style="margin-top: 15px; text-align: center; font-size: 13px;">
-                Chưa có tài khoản? <a href="DangKy.aspx">Đăng ký ngay</a> <br />
+                <%-- Hệ thống không có đăng ký công khai, tài khoản do Admin cấp --%>
+                Tài khoản do quản trị viên cấp. Liên hệ Admin nếu bạn chưa có tài khoản.<br />
                 <a href="Phim.aspx" style="display: inline-block; margin-top: 10px;">Quay lại trang chủ</a>
             </div>
         </div>

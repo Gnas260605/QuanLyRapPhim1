@@ -54,6 +54,12 @@ namespace QuanLyRapPhim {
         protected global::System.Web.UI.WebControls.Literal litSepDash;
         protected global::System.Web.UI.WebControls.HyperLink lnkQuanLyPhim;
         protected global::System.Web.UI.WebControls.Literal litSepQuanLy;
+        protected global::System.Web.UI.WebControls.HyperLink lnkQuanLyLichChieu;
+        protected global::System.Web.UI.WebControls.Literal litSepLichChieu;
+        protected global::System.Web.UI.WebControls.HyperLink lnkQuanLyPhong;
+        protected global::System.Web.UI.WebControls.Literal litSepPhong;
+        protected global::System.Web.UI.WebControls.HyperLink lnkQuanLyNguoiDung;
+        protected global::System.Web.UI.WebControls.Literal litSepNguoiDung;
         protected global::System.Web.UI.WebControls.Panel pnlChuaDangNhap;
         protected global::System.Web.UI.WebControls.Panel pnlDaDangNhap;
         protected global::System.Web.UI.WebControls.Label lblTenNguoiDung;

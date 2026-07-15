@@ -6,7 +6,9 @@
 
     <asp:Label ID="lblChuaDangNhap" runat="server" Text="Vui lòng đăng nhập để xem lịch sử đặt vé!" ForeColor="Red" Font-Italic="True" Visible="False"></asp:Label>
 
-    <asp:GridView ID="gvLichSu" runat="server" AutoGenerateColumns="False" Width="100%" CellPadding="10" ForeColor="#e2e8f0" GridLines="None" style="border-collapse: collapse; margin-top: 15px;">
+    <asp:Label ID="lblMsg" runat="server" Font-Bold="True" style="display: block; margin-bottom: 12px;"></asp:Label>
+
+    <asp:GridView ID="gvLichSu" runat="server" AutoGenerateColumns="False" Width="100%" CellPadding="10" ForeColor="#e2e8f0" GridLines="None" OnRowCommand="gvLichSu_RowCommand" style="border-collapse: collapse; margin-top: 15px;">
         <HeaderStyle BackColor="#12121c" ForeColor="#a0aec0" Font-Bold="True" Height="45px" />
         <RowStyle BackColor="#1e1e2d" Height="40px" />
         <AlternatingRowStyle BackColor="#171725" />
@@ -19,6 +21,11 @@
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="TenPhong" HeaderText="Phòng" />
+            <asp:TemplateField HeaderText="Ghế">
+                <ItemTemplate>
+                    <span style="color: #4fd1c5;"><%# Eval("DanhSachGhe") %></span>
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:BoundField DataField="NgayDat" HeaderText="Ngày Mua" DataFormatString="{0:dd/MM/yyyy HH:mm}" />
             <asp:TemplateField HeaderText="Tổng Tiền">
                 <ItemTemplate>
@@ -26,6 +33,15 @@
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="TrangThai" HeaderText="Trạng Thái" />
+            <asp:TemplateField HeaderText="">
+                <ItemTemplate>
+                    <asp:LinkButton ID="btnHuyVe" runat="server" Text="Hủy vé"
+                        CommandName="CancelVe" CommandArgument='<%# Eval("MaDatVe") %>'
+                        Visible='<%# Convert.ToInt32(Eval("CoTheHuy")) == 1 %>'
+                        OnClientClick="return confirm('Bạn chắc chắn muốn hủy vé này? Thao tác không thể hoàn tác.');"
+                        style="color: #e53e3e; font-weight: 600; text-decoration: none;"></asp:LinkButton>
+                </ItemTemplate>
+            </asp:TemplateField>
         </Columns>
     </asp:GridView>
 

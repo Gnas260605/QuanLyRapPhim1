@@ -74,13 +74,14 @@
     </Content>
     <Content Include="ChiTietPhim.aspx" />
     <Content Include="ChonGhe.aspx" />
-    <Content Include="DangKy.aspx" />
     <Content Include="DangNhap.aspx" />
+    <Content Include="DoiMatKhau.aspx" />
     <Content Include="Global.asax" />
     <Content Include="LichSuDatVe.aspx" />
     <Content Include="Phim.aspx" />
     <Content Include="QuanLyLichChieu.aspx" />
     <Content Include="QuanLyNguoiDung.aspx" />
+    <Content Include="QuanLyPhongChieu.aspx" />
     <Content Include="style.css" />
     <Content Include="AdminPhim.aspx" />
     <Content Include="ThanhToan.aspx" />
@@ -109,11 +110,13 @@
     <Compile Include="ChonGhe.aspx.designer.cs">
       <DependentUpon>ChonGhe.aspx</DependentUpon>
     </Compile>
-    <Compile Include="DangKy.aspx.cs">
-      <DependentUpon>DangKy.aspx</DependentUpon>
+    <Compile Include="DoiMatKhau.aspx.cs">
+      <DependentUpon>DoiMatKhau.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="DangKy.aspx.designer.cs" />
+    <Compile Include="DoiMatKhau.aspx.designer.cs">
+      <DependentUpon>DoiMatKhau.aspx</DependentUpon>
+    </Compile>
     <Compile Include="DangNhap.aspx.cs">
       <DependentUpon>DangNhap.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -167,6 +170,13 @@
     </Compile>
     <Compile Include="QuanLyNguoiDung.aspx.designer.cs">
       <DependentUpon>QuanLyNguoiDung.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuanLyPhongChieu.aspx.cs">
+      <DependentUpon>QuanLyPhongChieu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuanLyPhongChieu.aspx.designer.cs">
+      <DependentUpon>QuanLyPhongChieu.aspx</DependentUpon>
     </Compile>
     <Compile Include="Role.cs" />
     <Compile Include="SecurePage.cs">

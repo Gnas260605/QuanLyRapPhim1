@@ -49,8 +49,8 @@ namespace QuanLyRapPhim
             string theLoai = txtTheLoai.Text.Trim();
             int thoiLuong = Convert.ToInt32(txtThoiLuong.Text.Trim());
             string daoDien = txtDaoDien.Text.Trim();
-            string hinhAnh = txtHinhAnh.Text.Trim();
             string moTa = txtMoTa.Text.Trim();
+            bool laThemMoi = string.IsNullOrEmpty(hdnMaPhim.Value);
             DateTime ngayKhoiChieu;
 
             if (!DateTime.TryParse(txtNgayKhoiChieu.Text.Trim(), out ngayKhoiChieu))
@@ -58,6 +58,26 @@ namespace QuanLyRapPhim
                 lblMsg.ForeColor = System.Drawing.Color.Red;
                 lblMsg.Text = "Định dạng ngày không hợp lệ! Hãy nhập kiểu yyyy-MM-dd.";
                 return;
+            }
+
+            // Xử lý ảnh: thêm mới bắt buộc chọn ảnh; khi sửa không chọn thì giữ ảnh cũ
+            string hinhAnh;
+            if (fuHinhAnh.HasFile)
+            {
+                if (!XuLyLuuAnh(out hinhAnh))
+                {
+                    return; // Thông báo lỗi đã được đặt trong XuLyLuuAnh
+                }
+            }
+            else if (laThemMoi)
+            {
+                lblMsg.ForeColor = System.Drawing.Color.Red;
+                lblMsg.Text = "Vui lòng chọn ảnh cho phim!";
+                return;
+            }
+            else
+            {
+                hinhAnh = hdnHinhAnhCu.Value; // Giữ nguyên ảnh cũ
             }
 
             using (SqlConnection conn = new SqlConnection(GetConnectionString()))
@@ -111,6 +131,7 @@ namespace QuanLyRapPhim
         protected void gvPhim_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             int maPhim = Convert.ToInt32(e.CommandArgument);
+            lblMsg.Text = ""; // Xóa thông báo cũ khi bắt đầu thao tác mới
 
             if (e.CommandName == "EditMovie")
             {
@@ -126,8 +147,11 @@ namespace QuanLyRapPhim
                     txtThoiLuong.Text = r["ThoiLuong"].ToString();
                     txtDaoDien.Text = r["DaoDien"].ToString();
                     txtNgayKhoiChieu.Text = Convert.ToDateTime(r["NgayKhoiChieu"]).ToString("yyyy-MM-dd");
-                    txtHinhAnh.Text = r["HinhAnh"].ToString();
                     txtMoTa.Text = r["MoTa"].ToString();
+
+                    // Ảnh: lưu tên ảnh cũ để giữ lại nếu không upload ảnh mới
+                    hdnHinhAnhCu.Value = r["HinhAnh"].ToString();
+                    lblHinhHienTai.Text = "Ảnh hiện tại: " + r["HinhAnh"].ToString() + " (để trống nếu không đổi ảnh)";
 
                     lblFormTitle.Text = "Cập nhật thông tin phim (Mã: " + maPhim + ")";
                     btnSave.Text = "Cập nhật";
@@ -174,10 +198,59 @@ namespace QuanLyRapPhim
             txtThoiLuong.Text = "";
             txtDaoDien.Text = "";
             txtNgayKhoiChieu.Text = "";
-            txtHinhAnh.Text = "";
+            hdnHinhAnhCu.Value = "";
+            lblHinhHienTai.Text = "";
             txtMoTa.Text = "";
             lblFormTitle.Text = "Thêm phim mới";
             btnSave.Text = "Lưu Phim";
+        }
+
+        /// <summary>
+        /// Kiểm tra và lưu ảnh upload vào thư mục ~/img/.
+        /// Trả về true nếu lưu thành công, tên file lưu trong tham số out hinhAnh.
+        /// </summary>
+        private bool XuLyLuuAnh(out string hinhAnh)
+        {
+            hinhAnh = "";
+
+            // 1. Kiểm tra phần mở rộng hợp lệ
+            string[] phanMoRongChoPhep = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            string phanMoRong = System.IO.Path.GetExtension(fuHinhAnh.FileName).ToLower();
+            if (Array.IndexOf(phanMoRongChoPhep, phanMoRong) < 0)
+            {
+                lblMsg.ForeColor = System.Drawing.Color.Red;
+                lblMsg.Text = "Chỉ chấp nhận ảnh định dạng jpg, jpeg, png, gif, webp!";
+                return false;
+            }
+
+            // 2. Giới hạn dung lượng 4MB
+            if (fuHinhAnh.PostedFile.ContentLength > 4 * 1024 * 1024)
+            {
+                lblMsg.ForeColor = System.Drawing.Color.Red;
+                lblMsg.Text = "Ảnh vượt quá dung lượng cho phép (tối đa 4MB)!";
+                return false;
+            }
+
+            // 3. Tạo tên file an toàn, tránh trùng bằng cách thêm mốc thời gian
+            string tenGoc = System.IO.Path.GetFileNameWithoutExtension(fuHinhAnh.FileName);
+            string tenAnToan = System.Text.RegularExpressions.Regex.Replace(tenGoc, @"[^a-zA-Z0-9_-]", "");
+            if (string.IsNullOrEmpty(tenAnToan)) tenAnToan = "phim";
+            string tenFile = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + tenAnToan + phanMoRong;
+
+            // 4. Lưu file vào thư mục img
+            try
+            {
+                string duongDan = Server.MapPath("~/img/" + tenFile);
+                fuHinhAnh.SaveAs(duongDan);
+                hinhAnh = tenFile;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                lblMsg.ForeColor = System.Drawing.Color.Red;
+                lblMsg.Text = "Lỗi khi lưu ảnh: " + ex.Message;
+                return false;
+            }
         }
     }
 }

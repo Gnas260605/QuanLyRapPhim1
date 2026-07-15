@@ -22,6 +22,31 @@ namespace QuanLyRapPhim
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DataList DataList1;
+
+        /// <summary>
+        /// txtTimKiem control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.TextBox txtTimKiem;
+
+        /// <summary>
+        /// btnTimKiem control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnTimKiem;
+
+        /// <summary>
+        /// btnXoaTim control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnXoaTim;
+
+        /// <summary>
+        /// lblKetQua control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblKetQua;
+
+        /// <summary>
+        /// lblKhongCoPhim control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Label lblKhongCoPhim;
     }
 }
 

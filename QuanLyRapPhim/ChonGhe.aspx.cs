@@ -40,7 +40,28 @@ namespace QuanLyRapPhim
                 return;
             }
 
+            // Chặn truy cập vào suất chiếu đã diễn ra (hoặc mã suất chiếu không tồn tại)
+            if (!KiemTraSuatChieuConHieuLuc(maLichChieu))
+            {
+                Response.Redirect("Phim.aspx");
+                return;
+            }
+
             LoadGhe();
+        }
+
+        // Kiểm tra suất chiếu còn hiệu lực (tồn tại và chưa diễn ra)
+        private bool KiemTraSuatChieuConHieuLuc(string maLichChieu)
+        {
+            int maLC;
+            if (!int.TryParse(maLichChieu, out maLC)) return false;
+
+            string sql = "select count(*) as SoLuong from LichChieu " +
+                         "where MaLichChieu = " + maLC + " " +
+                         "and (NgayChieu > CAST(GETDATE() AS date) " +
+                         "     or (NgayChieu = CAST(GETDATE() AS date) and GioBatDau > CAST(GETDATE() AS time)))";
+            DataTable dt = kn.LayKetNoi(sql);
+            return dt != null && dt.Rows.Count > 0 && Convert.ToInt32(dt.Rows[0]["SoLuong"]) > 0;
         }
 
         // Tải sơ đồ ghế của phòng chiếu
@@ -203,6 +224,13 @@ namespace QuanLyRapPhim
             if (SelectedSeatIds.Count == 0)
             {
                 lblThongBao.Text = "Vui lòng chọn ít nhất 1 ghế!";
+                return;
+            }
+
+            // Kiểm tra lại suất chiếu còn hiệu lực (người dùng có thể mở trang quá lâu)
+            if (!KiemTraSuatChieuConHieuLuc(Request.QueryString["MaLichChieu"]))
+            {
+                lblThongBao.Text = "Suất chiếu này đã bắt đầu, không thể đặt vé nữa!";
                 return;
             }
 
